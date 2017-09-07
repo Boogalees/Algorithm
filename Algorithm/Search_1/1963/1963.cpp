@@ -1,61 +1,100 @@
+
 #include <iostream>
-#include <vector>
 #include <queue>
-#include <string>
+#include <string.h>
+
+int arr[4];
+
+int Arr_to_Int(int arr[])
+{
+    int temp = arr[0]*1000 + arr[1]*100 + arr[2]*10 + arr[3];
+    return temp;
+}
+void Set_arr(int arr[],int n)
+{
+    arr[0] = n / 1000;
+    arr[1] = (n%1000 - (n%100))/100;
+    arr[2] = (n%100 - (n%10))/10;
+    arr[3] = n%10;
+}
 using namespace std;
+int main()
+{
 
-bool check[10001];
-int dist[10001];
-bool prime[10001];
 
-int change(int k, int l, int m) {
-	if (l == 0 && m == 0) return -1;
-	string s = to_string(k);
-	s[l] = m;
-	return stoi(s);
+    int dis[10000] = {0,};
+    bool prime[10000] = {false,};
+    bool check[10000] = {false,};
+    int T;
+    cin >>T;
+
+
+
+    for (int i=2; i<=10000; i++) {
+        if (prime[i] == false) {
+          for (int j=i*i; j <= 10000; j+=i) {
+                prime[j] = true;
+            }
+        }
+    }
+
+     for (int i=0; i<=10000; i++) {
+        prime[i] = !prime[i];
+    }
+
+
+
+    while(T--)
+    {
+         int n,m;
+         cin >> n >> m;
+         memset(dis,false,sizeof(dis));
+         memset(check,false,sizeof(check));
+         queue<int> Q;
+         Q.push(n);
+         Set_arr(arr,n);
+         dis[n] = 0;
+         check[n] = true;
+         while(!Q.empty())
+         {
+
+          //  cout << Q.front() << endl;
+
+            int next;
+            int cur = Q.front();
+
+            Q.pop();
+
+            //cout << cur << endl;
+
+            for(int j=0; j<4; j++)
+            {
+
+                Set_arr(arr,cur);
+                for(int i=0; i<10; i++)
+                {
+                       if(j==0 && i==0) continue;
+                       arr[j] = i;
+                       next = Arr_to_Int(arr);
+                       if(prime[next] && !check[next])
+                       {
+                         Q.push(next);
+                         check[next] = true;
+                         dis[next] = dis[cur] + 1;
+
+                       }
+                }
+                 //Set_arr(arr,cur);
+            }
+
+
+        }
+
+      cout<< dis[m]<< endl;
+    }
+
+
+
+    return 0;
 }
 
-int main(void) {
-	int T, p1, p2;
-	queue<int> q;
-
-	scanf("%d", &T);
-
-	for (int i = 1000; i < 10000; i++) {
-		for (int j = 2; j <= i; j++) {
-			if (i%j == 0)
-				prime[i] = true; //소수가 아님
-		}
-	}
-
-	while (T--) {
-		scanf("%d %d", &p1, &p2);
-
-		q.push(p1);
-		check[p1] = true;
-		dist[p1] = 0;
-		while (!q.empty()) {
-			int now = q.front();
-			q.pop();
-			
-			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 10; j++) {
-					int tmp = change(now, i, j);
-					if (tmp != -1) {
-						if (prime[tmp] && check[tmp] == false) {
-							q.push(tmp);
-							check[tmp] = true;
-							dist[tmp] = dist[now] + 1;
-						}
-					}
-					
-				}
-			}
-
-		}
-
-	
-	}
-
-	return 0;
-}
